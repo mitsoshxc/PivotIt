@@ -1,0 +1,24 @@
+﻿@model PivotIt.Web.Models.Account.LoginForm
+@{
+    ViewData["Title"] = "Login";
+}
+
+
+<h1>Login</h1>
+
+@using (Html.BeginForm(FormMethod.Post))
+{
+    <div class="form-group">
+        @Html.LabelFor(x => x.Username)
+        @Html.TextBoxFor(x => x.Username, new { @class="form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(x => x.Password)
+        @Html.PasswordFor(x => x.Password, new { @class="form-control" })
+    </div>
+
+    <button type="submit" class="btn btn-primary">Go</button>
+}
+
+<a asp-controller="Account" asp-action="Register">Register</a>

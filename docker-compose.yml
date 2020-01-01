@@ -1,0 +1,42 @@
+version: '3.4'
+
+services:
+  pivotit.web:
+    restart: always
+    image: ${DOCKER_REGISTRY-}pivotitweb
+    build:
+      context: .
+      dockerfile: PivotIt.Web/Dockerfile
+    networks:
+        - app
+        - elastic
+  es01:
+    restart: always
+    image: elasticsearch:7.5.1
+    container_name: es01
+    hostname: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      #- discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01 #,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./ElasticData:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+      - app
+
+
+networks:
+  app:
+    driver: bridge
+  elastic:
+    driver: bridge

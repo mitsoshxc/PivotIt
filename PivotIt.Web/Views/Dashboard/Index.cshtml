@@ -1,0 +1,11 @@
+﻿<h1>Hello @User.Identity.Name</h1>
+
+@(await Html.RenderComponentAsync<PivotIt.Web.Components.Counter>(RenderMode.ServerPrerendered).ConfigureAwait(false))
+
+@(await Html.RenderComponentAsync<PivotIt.Web.Components.UserMessages.SearchUserMessages>(RenderMode.ServerPrerendered).ConfigureAwait(false))
+
+@section Scripts
+{
+    <script src="_framework/blazor.server.js">
+    </script>
+}

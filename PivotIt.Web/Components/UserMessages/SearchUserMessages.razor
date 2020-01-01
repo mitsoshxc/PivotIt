@@ -1,0 +1,46 @@
+﻿@using PivotIt.Search.Documents
+@using PivotIt.Search.Services.UserMessages
+@using Nest
+@inject IUserMessageSearchService _userMessageService
+
+<h3>Search User Messages</h3>
+
+<form>
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Search form subject" @bind-value="@Term" @bind-value:event="oninput" @onkeyup="@SearchTerm" />
+    </div>
+</form>
+
+@if ((SearchResponse?.Documents?.Any() ?? false) && !string.IsNullOrWhiteSpace(Term))
+{
+    foreach (var result in SearchResponse.Documents)
+    {
+        <p>
+            @result.Subject
+        </p>
+    }
+}
+else
+{
+    if (string.IsNullOrWhiteSpace(Term))
+    {
+        <p>
+            Type a subject to begin search...
+        </p>
+    }
+    else
+    {
+        <p>No results found for '@Term'</p>
+    }
+}
+
+@code {
+    private ISearchResponse<UserMessageDocument> SearchResponse;
+
+    private string Term;
+
+    private async Task SearchTerm()
+    {
+        SearchResponse = await _userMessageService.BySubject(Term).ConfigureAwait(false);
+    }
+}
