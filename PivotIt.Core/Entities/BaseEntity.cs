@@ -1,7 +1,11 @@
-﻿namespace PivotIt.Core.Entities
+﻿using System.Collections.Generic;
+
+namespace PivotIt.Core.Entities
 {
-    public interface IBaseEntity
+    public class BaseEntity
     {
-        int ID { get; set; }
+        public int ID { get; set; }
+
+        public List<BaseDomainEvent> Events = new List<BaseDomainEvent>();
     }
 }

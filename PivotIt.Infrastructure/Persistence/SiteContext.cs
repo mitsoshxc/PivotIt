@@ -1,14 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using PivotIt.Core.Entities;
+using PivotIt.Core.Interfaces;
 using PivotIt.Infrastructure.Entities;
 using PivotIt.Infrastructure.Models;
+using PivotIt.Infrastructure.Services.Users;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PivotIt.Infrastructure.Persistence
 {
     public class SiteContext : DbContext
     {
+        private readonly IDomainEventDispatcher _dispatcher;
+
         private readonly DatabaseOptions _databaseOptions;
 
         public DbSet<SiteUser> SiteUser { get; set; }
@@ -19,10 +25,9 @@ namespace PivotIt.Infrastructure.Persistence
 
         public DbSet<UserMessageAttachment> UserMessageAttachment { get; set; }
 
-
-
-        public SiteContext(IOptionsMonitor<DatabaseOptions> databaseOptions) : base()
+        public SiteContext(IOptionsMonitor<DatabaseOptions> databaseOptions, IDomainEventDispatcher dispatcher) : base()
         {
+            _dispatcher = dispatcher;
             _databaseOptions = databaseOptions.CurrentValue;
         }
 
@@ -50,6 +55,35 @@ namespace PivotIt.Infrastructure.Persistence
 
             AddIndexes(modelBuilder);
         }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            int result = await base.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+            if (_dispatcher == null)
+            {
+                return result;
+            }
+
+            var entitiesWithEvents = ChangeTracker.Entries<BaseEntity>().Select(x => x.Entity).Where(x => x.Events.Any()).ToArray();
+
+            foreach (var entity in entitiesWithEvents)
+            {
+                var events = entity.Events.ToArray();
+                entity.Events.Clear();
+                foreach (var domainEvent in events)
+                {
+                    await _dispatcher.Dispatch(domainEvent).ConfigureAwait(false);
+                }
+            }
+
+            return result;
+        }
+
+        //public override int SaveChanges()
+        //{
+        //    return SaveChangesAsync().GetAwaiter().GetResult();
+        //}
 
         private void AddIndexes(ModelBuilder modelBuilder)
         {

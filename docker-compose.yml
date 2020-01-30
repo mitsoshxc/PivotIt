@@ -7,9 +7,6 @@ services:
     build:
       context: .
       dockerfile: PivotIt.Web/Dockerfile
-    networks:
-        - app
-        - elastic
   es01:
     restart: always
     image: elasticsearch:7.5.1
@@ -30,13 +27,3 @@ services:
       - ./ElasticData:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
-    networks:
-      - elastic
-      - app
-
-
-networks:
-  app:
-    driver: bridge
-  elastic:
-    driver: bridge

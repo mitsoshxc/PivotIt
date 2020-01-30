@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,6 +17,14 @@ namespace PivotIt.Infrastructure.Helpers
                     context.Database.Migrate();
                 }
             }
+        }
+
+        public static IContainer CreateIoCContainer(IServiceCollection services)
+        {
+            var builder = new ContainerBuilder();
+            builder.Populate(services);
+
+            return builder.Build();
         }
     }
 }

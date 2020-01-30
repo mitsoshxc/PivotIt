@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace PivotIt.Core.Entities
 {
-    public class UserMessage : IBaseEntity
+    public class UserMessage : BaseEntity
     {
-        public int ID { get; set; }
-
         public string UserID { get; set; }
 
         public string CCUsersID { get; set; }
@@ -17,10 +13,8 @@ namespace PivotIt.Core.Entities
         public string MessageBody { get; set; }
     }
 
-    public class UserMessageAttachment : IBaseEntity
+    public class UserMessageAttachment : BaseEntity
     {
-        public int ID { get; set; }
-
         public string AttachmentPath { get; set; }
 
         public int MessageID { get; set; }
